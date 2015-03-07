@@ -7,6 +7,20 @@ defmodule Mp3File do
     id3_section
   end
 
-  def parse_id3(id3) do
+  defp parse_id3(metadata) do
+    << _ :: binary-size(3), title :: binary-size(30), _ :: binary >> = metadata
+    %{
+      title: sanitize(title)
+    }
+  end
+
+  defp sanitize(text) do
+    not_zero = &(&1 != <<0>>)
+    text |> String.graphemes |> Enum.filter(not_zero) |> to_string
+  end
+
+  def extract_id3(file) do
+    metadata = extract_metadata(file)
+    parse_id3(metadata)
   end
 end
