@@ -1,0 +1,2 @@
+defmodule ShotcastServer do
+end
