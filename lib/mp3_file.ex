@@ -8,15 +8,17 @@ defmodule Mp3File do
   end
 
   defp parse_id3(metadata) do
-    << _ :: binary-size(3), title :: binary-size(30), _ :: binary >> = metadata
+    << _ :: binary-size(3), title :: binary-size(30), artist :: binary-size(30), album :: binary-size(30), _ :: binary >> = metadata
     %{
-      title: sanitize(title)
+      title: sanitize(title),
+      artist: sanitize(artist),
+      album: sanitize(album)
     }
   end
 
   defp sanitize(text) do
     not_zero = &(&1 != <<0>>)
-    text |> String.graphemes |> Enum.filter(not_zero) |> to_string
+    text |> String.graphemes |> Enum.filter(not_zero) |> to_string |> String.strip
   end
 
   def extract_id3(file) do
