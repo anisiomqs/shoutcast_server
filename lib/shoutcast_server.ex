@@ -47,9 +47,7 @@ defmodule ShoutcastServer do
 
   def icy_header do
     ["ICY 200 OK\r\n",
-     "icy-notice1: <BR>This stream requires",
-     "<a href=\"http://www.winamp.com/\">Winamp</a><BR>\r\n",
-     "icy-notice2: Erlang Shoutcast server<BR>\r\n",
+     "icy-notice1: Elixir Shoutcast server<BR>\r\n",
      "icy-name: Elixir mix\r\n",
      "icy-genre: Rock\r\n",
      "icy-url: http://localhost:#{@port}\r\n",
