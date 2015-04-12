@@ -1,4 +1,4 @@
-defmodule ShotcastServer.Mixfile do
+defmodule ShoutcastServer.Mixfile do
   use Mix.Project
 
   def project do
@@ -13,7 +13,7 @@ defmodule ShotcastServer.Mixfile do
   # Type `mix help compile.app` for more information
   def application do
     [applications: [:logger],
-     mod: {ShotcastServer, []}]
+     mod: {ShoutcastServer, []}]
   end
 
   # Dependencies can be Hex packages:

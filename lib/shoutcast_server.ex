@@ -1,17 +1,14 @@
-defmodule ShotcastServer do
+defmodule ShoutcastServer do
   use Application
 
   def start(_type, _args) do
     import Supervisor.Spec, warn: false
 
     children = [
-      # worker(ShotcastServer.Worker, [arg1, arg2, arg3])
+      # worker(ShoutcastServer.Worker, [arg1, arg2, arg3])
     ]
 
-    # TODO I'm sure this is not the correct place
-    init
-
-    opts = [strategy: :one_for_one, name: ShotcastServer.Supervisor]
+    opts = [strategy: :one_for_one, name: ShoutcastServer.Supervisor]
     Supervisor.start_link(children, opts)
   end
 
@@ -30,7 +27,7 @@ defmodule ShotcastServer do
     case Socket.Stream.recv(client) do
       {:ok, data} ->
         if String.contains?(data, "icy-metadata: 1") do
-          Socket.Stream.send!(client, response)
+          Socket.Stream.send!(client, icy_header)
           client |> send_file(File.read!(@song), Mp3File.extract_id3(@song))
         end
       {:error, reason} -> IO.inspect(reason)
@@ -41,20 +38,20 @@ defmodule ShotcastServer do
     client |> Socket.close
   end
 
-  def send_file(client, file, %{ title: title } = file_info, begin \\ 0) do
+  def send_file(client, file, %{ title: title } = file_info) do
     << file_part :: binary-size(@chunksize), file :: binary >> = file
     payload = file_part <> file_descriptor(title)
     client |> Socket.Stream.send!(payload)
-    send_file(client, file, file_info, begin + @chunksize)
+    send_file(client, file, file_info)
   end
 
-  def response do
+  def icy_header do
     ["ICY 200 OK\r\n",
      "icy-notice1: <BR>This stream requires",
      "<a href=\"http://www.winamp.com/\">Winamp</a><BR>\r\n",
      "icy-notice2: Erlang Shoutcast server<BR>\r\n",
-     "icy-name: Erlang mix\r\n",
-     "icy-genre: Pop Top 40 Dance Rock\r\n",
+     "icy-name: Elixir mix\r\n",
+     "icy-genre: Rock\r\n",
      "icy-url: http://localhost:#{@port}\r\n",
      "content-type: audio/mpeg\r\n",
      "icy-pub: 1\r\n",
