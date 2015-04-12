@@ -17,4 +17,15 @@ defmodule ShoutcastServerTest do
     """
     assert actual == expected
   end
+
+  test "the file descriptor" do
+    actual = ShoutcastServer.file_descriptor("Lose your religion")
+    << actual_size :: binary-size(1), _ :: binary >> = actual
+    # TODO fix this
+    # actual_size = String.to_integer(actual_size) * 16
+    # expected_size = byte_size(actual)
+
+    # assert actual_size == expected_size
+    assert << 5, "StreamTitle='Lose your religion';StreamUrl='http://localhost:4040';", rest :: binary-size(13)>> = actual
+  end
 end
