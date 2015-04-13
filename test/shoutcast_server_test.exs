@@ -21,8 +21,7 @@ defmodule ShoutcastServerTest do
 
   test "the file descriptor" do
     file_descriptor = ShoutcastServer.file_descriptor("Lose your religion")
-    << metadata_size_binary :: binary-size(1), metadata :: binary >> = file_descriptor
-    [metadata_size|_] = to_char_list(metadata_size_binary)
+    << metadata_size, metadata :: binary >> = file_descriptor
     metadata_size_in_bytes = metadata_size * 16
     expected_metadata_size_in_bytes = byte_size(metadata)
 
