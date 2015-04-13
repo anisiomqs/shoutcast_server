@@ -20,14 +20,14 @@ defmodule ShoutcastServerTest do
   end
 
   test "the file descriptor" do
-    actual = ShoutcastServer.file_descriptor("Lose your religion")
-    # TODO fix this
-    # << actual_size :: binary-size(1), _ :: binary >> = actual
-    # actual_size = String.to_integer(actual_size) * 16
-    # expected_size = byte_size(actual)
+    file_descriptor = ShoutcastServer.file_descriptor("Lose your religion")
+    << metadata_size_binary :: binary-size(1), metadata :: binary >> = file_descriptor
+    [metadata_size|_] = to_char_list(metadata_size_binary)
+    metadata_size_in_bytes = metadata_size * 16
+    expected_metadata_size_in_bytes = byte_size(metadata)
 
-    # assert actual_size == expected_size
-    assert << 5, "StreamTitle='Lose your religion';StreamUrl='http://localhost:4040';", _ :: binary-size(13)>> = actual
+    assert metadata_size_in_bytes == expected_metadata_size_in_bytes
+    assert << "StreamTitle='Lose your religion';StreamUrl='http://localhost:4040';", _ :: binary-size(13)>> = metadata
   end
 
   test "send icy request to server" do
