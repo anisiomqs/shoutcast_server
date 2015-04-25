@@ -10,7 +10,6 @@ To do:
 * Extract ID3 from files; `Done`
 * List mp3 files from directory; `Done`
 * Allow multiple clients; `Done`
-* Random playlist
-  - When song ends, select next from playlist and stream it
+* Random playlist; `Done`
 * Handle disconnection
   - integrate :gen_server
