@@ -19,14 +19,20 @@ defmodule ShoutcastServer do
   def init do
     server = Socket.TCP.listen!(@port, packet: 0)
     IO.puts "Server listening in http://localhost:#{@port}"
+    accept(server)
+  end
+
+  def accept(server) do
     client = server |> Socket.TCP.accept!
+    pid = spawn_link(ShoutcastServer,:accept, [server])
+    IO.inspect(pid)
     recv(client)
   end
 
   def recv(client) do
     case Socket.Stream.recv(client) do
       {:ok, data} ->
-        if String.contains?(data, "icy-metadata: 1") do
+        if String.contains?(String.downcase(data), "icy-metadata: 1") do
           Socket.Stream.send!(client, icy_header)
           client |> send_file(File.read!(@song), Mp3File.extract_id3(@song))
         end
