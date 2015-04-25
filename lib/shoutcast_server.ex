@@ -14,9 +14,10 @@ defmodule ShoutcastServer do
 
   @chunksize 24576
   @port 4040
-  @song "test/fixtures/nederland.mp3"
+  @folder "test/fixtures/"
 
   def init do
+    :random.seed(:os.timestamp)
     server = Socket.TCP.listen!(@port, packet: 0)
     IO.puts "Server listening in http://localhost:#{@port}"
     accept(server)
@@ -29,12 +30,20 @@ defmodule ShoutcastServer do
     recv(client)
   end
 
+  def stream_folder(client) do
+    songs = Mp3File.list(@folder)
+    Enum.shuffle(songs) |> Enum.each(fn song ->
+      client |> send_file(File.read!(song), Mp3File.extract_id3(song))
+    end)
+    stream_folder(client)
+  end
+
   def recv(client) do
     case Socket.Stream.recv(client) do
       {:ok, data} ->
         if String.contains?(String.downcase(data), "icy-metadata: 1") do
           Socket.Stream.send!(client, icy_header)
-          client |> send_file(File.read!(@song), Mp3File.extract_id3(@song))
+          stream_folder(client)
         end
       {:error, reason} -> IO.inspect(reason)
     end
@@ -44,9 +53,16 @@ defmodule ShoutcastServer do
     client |> Socket.close
   end
 
+  def send_file(_client, "", _) do
+    :ok
+  end
+
   def send_file(client, file, %{ title: title } = file_info) do
-    << file_part :: binary-size(@chunksize), file :: binary >> = file
-    payload = file_part <> file_descriptor(title)
+    chunk = min(byte_size(file), @chunksize)
+    padding = @chunksize - chunk
+    padding = String.duplicate(<<0>>, padding)
+    << file_part :: binary-size(chunk), file :: binary >> = file
+    payload = file_part <> padding <> file_descriptor(title)
     client |> Socket.Stream.send!(payload)
     send_file(client, file, file_info)
   end

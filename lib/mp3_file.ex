@@ -27,6 +27,10 @@ defmodule Mp3File do
   end
 
   def extract_id3_list(folder) do
-    folder |> Path.join("**/*.mp3") |> Path.wildcard |> Enum.map(&extract_id3/1)
+    folder |> list |> Enum.map(&extract_id3/1)
+  end
+
+  def list(folder) do
+    folder |> Path.join("**/*.mp3") |> Path.wildcard
   end
 end
