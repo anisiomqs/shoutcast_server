@@ -3,7 +3,7 @@ Shoutcast Server
 
 Simple Shoutcast Server written in Elixir.
 
-It's not done yet.
+It's functional, but very raw.
 
 To do:
 
